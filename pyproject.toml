@@ -1,0 +1,18 @@
+[project]
+name = "ai-infra-course"
+version = "0.1.0"
+description = "AI Infra 系统性学习课程：原理 + 图解 + 动手实验"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy>=2.1",
+    "matplotlib>=3.9",
+    "rich>=13.9",
+    "psutil>=6.0",
+    "torch>=2.5",
+    "transformers>=4.45",
+    "tokenizers>=0.20",
+    "sentencepiece>=0.2",
+]
+
+[tool.uv]
+package = false

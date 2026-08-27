@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+models/
+*.gguf
+*.safetensors
+.ipynb_checkpoints/
