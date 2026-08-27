@@ -44,13 +44,13 @@ def fig3_memory_wall() -> None:
     ax1.set_ylabel("相对 P100 的倍数（对数轴）")
     ax1.set_title("算力涨了 106×，带宽只涨了 11×")
     ax1.legend(loc="upper left")
-    for i in (0, len(gpus) - 1):
-        ax1.annotate(f"{tflops[i]/tflops[0]:.0f}×", (x[i], tflops[i] / tflops[0]),
-                     textcoords="offset points", xytext=(0, 10),
-                     ha="center", color=C["compute"], fontweight="bold")
-        ax1.annotate(f"{bw[i]/bw[0]:.0f}×", (x[i], bw[i] / bw[0]),
-                     textcoords="offset points", xytext=(0, -18),
-                     ha="center", color=C["memory"], fontweight="bold")
+    last = len(gpus) - 1
+    ax1.annotate(f"{tflops[last]/tflops[0]:.0f}×", (x[last], tflops[last] / tflops[0]),
+                 textcoords="offset points", xytext=(-4, 12),
+                 ha="right", color=C["compute"], fontweight="bold")
+    ax1.annotate(f"{bw[last]/bw[0]:.0f}×", (x[last], bw[last] / bw[0]),
+                 textcoords="offset points", xytext=(-4, 12),
+                 ha="right", color=C["memory"], fontweight="bold")
 
     ratio = tflops * 1e12 / (bw * 1e9)   # ops per byte
     bars = ax2.bar(x, ratio, color=C["accent"], width=0.6)
@@ -60,11 +60,11 @@ def fig3_memory_wall() -> None:
     for b, v in zip(bars, ratio):
         ax2.text(b.get_x() + b.get_width() / 2, v + 8, f"{v:.0f}",
                  ha="center", fontweight="bold", color=C["accent"])
-    ax2.set_ylim(0, max(ratio) * 1.28)
+    ax2.set_ylim(0, max(ratio) * 1.45)
     ax2.axhline(1, color=C["compute"], ls="--", lw=1.5)
     ax2.annotate("自回归 decode 的算术强度 ≈ 1\n（差了两个数量级）",
-                 xy=(1.0, 1), xytext=(0.6, 90),
-                 color=C["compute"], fontsize=9, fontweight="bold",
+                 xy=(0.0, 1), xytext=(0.0, 395),
+                 color=C["compute"], fontsize=9, fontweight="bold", ha="center",
                  arrowprops=dict(arrowstyle="->", color=C["compute"], lw=1.4))
 
     fig.suptitle("图 3  内存墙：这就是大模型推理慢的物理根源", fontsize=14, fontweight="bold")
@@ -114,14 +114,16 @@ def fig5_token_budget() -> None:
     y = np.arange(len(names))
     ax2.barh(y, vals, color=C["capacity"], height=0.55)
     ax2.set_yticks(y); ax2.set_yticklabels(names)
-    ax2.invert_yaxis()
+    ax2.set_ylim(len(names) - 0.4, -1.15)
     ax2.set_xlabel("仅权重占用 (GB)")
     ax2.axvline(RTX4050["vram"], color=C["compute"], lw=2, ls="--")
-    ax2.text(RTX4050["vram"] + 0.2, len(names) - 0.6, "RTX 4050\n6 GB",
-             color=C["compute"], fontsize=9, fontweight="bold")
+    ax2.text(RTX4050["vram"], -0.75, "RTX 4050\n6 GB", ha="center", va="center",
+             color=C["compute"], fontsize=9, fontweight="bold",
+             bbox=dict(fc="white", ec="none", pad=1.5))
     ax2.axvline(11.0, color=C["memory"], lw=2, ls="--")
-    ax2.text(11.2, 1.5, "M4 16GB 统一内存\n(GPU 可用 ≈ 11 GB)",
-             color=C["memory"], fontsize=9, fontweight="bold")
+    ax2.text(11.0, -0.75, "M4 可用\n≈ 11 GB", ha="center", va="center",
+             color=C["memory"], fontsize=9, fontweight="bold",
+             bbox=dict(fc="white", ec="none", pad=1.5))
     ax2.set_xlim(0, 16)
     ax2.set_title("容量墙：能不能跑，先看装不装得下")
 
@@ -155,21 +157,22 @@ def fig4_arithmetic_intensity() -> None:
     ax.set_xticks(x); ax.set_xticklabels(labels)
     ax.set_ylabel("算术强度 (FLOP / Byte，对数轴)")
     ax.set_ylim(0.5, 6000)
+    ax.set_xlim(-1.15, len(cases) - 0.5)
 
     for b, v in zip(bars, ai):
         ax.text(b.get_x() + b.get_width() / 2, v * 1.15, f"{v:.0f}",
                 ha="center", fontweight="bold", fontsize=9)
 
     ax.axhline(ridge_m4, color=C["accent"], ls="--", lw=2)
-    ax.text(-0.45, ridge_m4 * 1.1, f"M4 平衡点 ≈ {ridge_m4:.0f}",
+    ax.text(-1.08, ridge_m4 * 1.12, f"M4 平衡点 ≈ {ridge_m4:.0f}",
             color=C["accent"], fontsize=9, fontweight="bold")
     ax.axhline(ridge_4050, color=C["ok"], ls="--", lw=2)
-    ax.text(-0.45, ridge_4050 * 1.1, f"RTX 4050 平衡点 ≈ {ridge_4050:.0f}",
+    ax.text(-1.08, ridge_4050 * 1.12, f"RTX 4050 平衡点 ≈ {ridge_4050:.0f}",
             color=C["ok"], fontsize=9, fontweight="bold")
 
-    ax.text(0.45, 900, "平衡点以上：算力受限（GPU 真在算）", fontsize=10,
+    ax.text(-1.08, 900, "平衡点以上：算力受限（GPU 真在算）", fontsize=10,
             color=C["compute"], ha="left", fontweight="bold", zorder=10)
-    ax.text(0.45, 380, "平衡点以下：带宽受限（GPU 在等内存）", fontsize=10,
+    ax.text(-1.08, 380, "平衡点以下：带宽受限（GPU 在等内存）", fontsize=10,
             color=C["memory"], ha="left", fontweight="bold", zorder=10)
 
     ax.set_title("图 4  同一个模型，Prefill 与 Decode 撞的是两堵完全不同的墙",
@@ -250,14 +253,19 @@ def fig2_causal_mask() -> None:
                                    gridspec_kw={"width_ratios": [1, 1.25]})
 
     # --- 左：因果掩码 ---
+    from matplotlib.colors import ListedColormap
+
     mask = np.tril(np.ones((n, n)))
-    ax1.imshow(mask, cmap="Blues", vmin=0, vmax=1.6)
+    ax1.imshow(mask, cmap=ListedColormap(["#E4EAF0", C["memory"]]), vmin=0, vmax=1)
     for i in range(n):
         for j in range(n):
             ok = j <= i
             ax1.text(j, i, "看得见" if ok else "挡住", ha="center", va="center",
                      fontsize=8.5, color="white" if ok else C["neutral"],
                      fontweight="bold" if ok else "normal")
+    ax1.set_xticks(np.arange(-0.5, n, 1), minor=True)
+    ax1.set_yticks(np.arange(-0.5, n, 1), minor=True)
+    ax1.grid(which="minor", color="white", linewidth=2.5)
     ax1.set_xticks(range(n)); ax1.set_xticklabels(toks)
     ax1.set_yticks(range(n)); ax1.set_yticklabels([f"第{i}行\n「{t}」" for i, t in enumerate(toks)])
     ax1.set_xlabel("能注意到哪些 token")
