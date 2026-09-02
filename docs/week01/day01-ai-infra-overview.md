@@ -422,21 +422,71 @@ $$
 
 ## 8. 手算练习（10 分钟，请拿纸笔）
 
-用 Llama-2-7B 的真实配置：
+### 8.0 先搞清楚：KV Cache 里到底存了什么
 
-```
-n_layers = 32,  d_model = 4096,  n_heads = 32,  head_dim = 128
-d_ffn    = 11008,  vocab = 32000
-```
+> 不知道从哪下手是正常的。这一小节把公式的每一项拆开，之后你能自己算任何模型。
 
-**Q1**. 每个 token 的 KV Cache 占多少字节（FP16）？
+**第一件事：这些参数去哪查？**
+
+任何 HuggingFace 模型页面的 `config.json`（点 Files → config.json），你只需要 5 个字段：
+
+| config.json 字段 | 含义 | Llama-2-7B | Llama-3-8B |
+|---|---|---|---|
+| `num_hidden_layers` | 有几层（$L$） | 32 | 32 |
+| `hidden_size` | 主干宽度（$d_{model}$） | 4096 | 4096 |
+| `num_attention_heads` | Q 有几个头 | 32 | 32 |
+| **`num_key_value_heads`** | **K/V 有几个头（$n_{kv}$）** | **32** | **8** |
+| `head_dim` | 每个头多宽（$d_h$），缺省 = $d_{model} / n_{heads}$ | 128 | 128 |
+
+**第二件事：为什么只存 K 和 V，不存 Q？**
+
+注意力的计算是：
+
+$$
+\text{out}_i = \text{softmax}\!\left(\frac{Q_i \cdot K_{1..i}^{\top}}{\sqrt{d_h}}\right) V_{1..i}
+$$
+
+生成第 $i$ 个 token 时，用到的是**它自己的 $Q_i$** 和**前面所有 token 的 $K$、$V$**。
+
+- $Q_i$ 算完这个 token 就没用了 → **用完即弃**
+- $K_j, V_j$ 会被 $j$ 之后的**每一个** token 反复用到 → **必须存下来**
+
+![KV Cache 存的是什么](../../assets/day01/fig6_kv_cache_origin.png)
+
+**第三件事：把公式拼出来**
+
+一个 token 经过**一层**，产生的 K 和 V 各有 $n_{kv} \times d_h$ 个数：
+
+$$
+\underbrace{2}_{K \text{ 和 } V} \times \underbrace{n_{kv} \times d_h}_{\text{每个各多少个数}} \times \underbrace{L}_{\text{每层都要存}} \times \underbrace{b}_{\text{每个数几字节}}
+$$
+
+$$
+\boxed{\ \text{KV/token} = 2 \cdot L \cdot n_{kv} \cdot d_h \cdot b\ }
+$$
+
+注意 **$n_{heads}$（Q 的头数）根本没出现在公式里** —— KV Cache 的大小只跟 `num_key_value_heads` 有关。
+这就是 GQA 能省显存的全部秘密：Q 头数不变（模型能力不掉），只砍 K/V 头数。
+
+---
+
+**Q1**. 每个 token 的 KV Cache 占多少字节（Llama-2-7B，FP16）？
 
 <details>
 <summary>点开答案</summary>
 
+把 Llama-2-7B 的数代进去：$L=32,\ n_{kv}=32,\ d_h=128,\ b=2$
+
 $$
-2\ (\text{K 和 V}) \times 32\ (\text{层}) \times 4096\ (\text{每层 KV 维度}) \times 2\ \text{Byte} = 524288\ \text{B} = \mathbf{512\ KB / token}
+2 \times 32 \times 32 \times 128 \times 2 = 524288\ \text{B} = \mathbf{512\ KB / token}
 $$
+
+分步看：
+```
+一层里 K 有 32×128 = 4096 个数，V 也是 4096 个  →  一层共 8192 个数
+32 层                                        →  262,144 个数
+FP16 每个数 2 字节                              →  524,288 B = 512 KB
+```
 
 **记住这个数**：Llama-2-7B 每个 token 半兆。2000 token 的上下文就是 **1 GB**。
 </details>
@@ -455,20 +505,26 @@ $$
 KV Cache 而非权重，才是并发数的真正瓶颈 —— 这是 Week 3 和 Week 8 的核心矛盾。
 </details>
 
-**Q3**. 如果换成 Llama-3-8B（用了 GQA，只有 8 个 KV head 而非 32 个），
+**Q3**. 如果换成 Llama-3-8B（用了 GQA，`num_key_value_heads` 从 32 降到 **8**），
 每 token 的 KV 是多少？能存多少 token？
 
 <details>
 <summary>点开答案</summary>
 
-KV 维度从 $32 \times 128 = 4096$ 降到 $8 \times 128 = 1024$，是原来的 1/4：
+公式里只有 $n_{kv}$ 变了，从 32 变成 8，其余全不变：
 
 $$
-2 \times 32 \times 1024 \times 2 = 131072\ \text{B} = \mathbf{128\ KB/token}
+2 \times 32 \times \underbrace{8}_{\text{原本是 }32} \times 128 \times 2 = 131072\ \text{B} = \mathbf{128\ KB/token}
 $$
 
-可存 token 数变成约 **13900**。**一个架构改动，把并发能力提升了 4 倍。**
-这就是为什么现在所有新模型都用 GQA/MQA/MLA（Day 17）。
+可存 token 数：
+
+$$
+\frac{1.7 \times 1024 \times 1024\ \text{KB}}{128\ \text{KB}} \approx \mathbf{13900\ \text{token}}
+$$
+
+**一个字段从 32 改成 8，并发能力提升了 4 倍。**
+而 Q 的头数还是 32，模型能力几乎没损失 —— 这就是为什么现在所有新模型都用 GQA/MQA/MLA（Day 17）。
 </details>
 
 ### 8.4 加餐：真实模型对照（2023 → 2026）
@@ -490,7 +546,7 @@ uv run python labs/day01/mem_calc.py --budget 6
 | DeepSeek-V3 (2024) | MLA，KV 压成 512 维隐向量 | FP8 | 34.3 KB | 34.3 GB | 1/15 |
 | **DeepSeek-V4-Flash (2026)** | MLA + CSA(4×)/HCA(128×) | FP8 | **5.6 KB** | **5.6 GB** | **1/92** |
 
-![KV Cache 演进](../../assets/day01/fig6_kv_evolution.png)
+![KV Cache 演进](../../assets/day01/fig7_kv_evolution.png)
 
 **四个关键读法：**
 

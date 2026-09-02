@@ -63,9 +63,10 @@ def fig3_memory_wall() -> None:
     ax2.set_ylim(0, max(ratio) * 1.45)
     ax2.axhline(1, color=C["compute"], ls="--", lw=1.5)
     ax2.annotate("自回归 decode 的算术强度 ≈ 1\n（差了两个数量级）",
-                 xy=(0.0, 1), xytext=(0.0, 395),
+                 xy=(0.15, 6), xytext=(1.55, 340),
                  color=C["compute"], fontsize=9, fontweight="bold", ha="center",
-                 arrowprops=dict(arrowstyle="->", color=C["compute"], lw=1.4))
+                 arrowprops=dict(arrowstyle="->", color=C["compute"], lw=1.4,
+                                 connectionstyle="arc3,rad=0.15"))
 
     fig.suptitle("图 3  内存墙：这就是大模型推理慢的物理根源", fontsize=14, fontweight="bold")
     fig.tight_layout()
