@@ -23,12 +23,15 @@
 uv sync                              # 一次性
 uv run python labs/day01/probe.py    # Day 01 实验
 uv run python labs/day02/roofline.py # Day 02 实验：画出你自己机器的 Roofline
-uv run python labs/day03/gpu_anatomy.py       # Day 03 实验：峰值核算 / Tile 量化 / cache line
+uv run python labs/day03/gpu_anatomy.py       # Day 03 实验·：峰值核算 / Tile 量化 / cache line
 uv run python labs/day04/memory_hierarchy.py  # Day 04 实验：把存储金字塔逐级测出来
 uv run python labs/day05/numerics.py          # Day 05 实验：把浮点数拆开看 / 量化误差
 uv run python labs/day06/stack_profile.py     # Day 06 实验：软件栈开销 / 异步 / profiler
+uv run python labs/day07/bench_hw.py          # Day 07 实验：一次量出机器的六个数（画像卡）
+uv run python labs/day07/bench_hw.py --predict   # 拿画像卡预测 TTFT / TPOT / 最大 batch
 
 uv run python labs/extra/x01_vectors.py       # 附加 X01：向量 / 点积 / 从零训词向量
+uv run python labs/extra/x02_shapes.py        # 附加 X02：矩阵三种读法 / 形状追踪 / AI≈batch
 ```
 
 ## 🎯 贯穿全课的主线问题
@@ -46,8 +49,8 @@ Day 01 提出，Day 84 你要能**不查资料、拿纸笔在 15 分钟内**完�
 
 | 周 | 主题 | 天 | 状态 |
 |---|---|---|---|
-| **W1** | 地基：体系结构视角 | [01](docs/week01/day01-ai-infra-overview.md) ⭐ [02](docs/week01/day02-roofline.md) ⭐ [03](docs/week01/day03-gpu-architecture.md) [04](docs/week01/day04-memory-hierarchy.md) [05](docs/week01/day05-numeric-formats.md) [06](docs/week01/day06-software-stack.md) 07 | 🟨 6/7 |
-| **附加** | **[Transformer 与背后的数学](EXTRA-SYLLABUS.md)** | [X01](docs/extra/x01-vectors.md) X02 X03 X04 X05 X06 X07 X08 X09 X10 | 🟨 1/10 |
+| **W1** | 地基：体系结构视角 | [01](docs/week01/day01-ai-infra-overview.md) ⭐ [02](docs/week01/day02-roofline.md) ⭐ [03](docs/week01/day03-gpu-architecture.md) [04](docs/week01/day04-memory-hierarchy.md) [05](docs/week01/day05-numeric-formats.md) [06](docs/week01/day06-software-stack.md) [07](docs/week01/day07-week1-review.md) ⭐ | ✅ 7/7 |
+| **附加** | **[Transformer 与背后的数学](EXTRA-SYLLABUS.md)** | [X01](docs/extra/x01-vectors.md) [X02](docs/extra/x02-matrices-shapes.md) X03 X04 X05 X06 X07 X08 X09 X10 | 🟨 2/10 |
 | **W2** | Transformer 解剖 | 08 09 10 11 12 13 14 | ⬜ |
 | **W3** | KV Cache 与注意力变体 | 15 ⭐ 16 ⭐ 17 18 19 20 21 | ⬜ |
 | **W4** | CUDA / Triton 算子 | 22 23 24 ⭐ 25 26 27 28 | ⬜ |

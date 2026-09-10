@@ -1,0 +1,18 @@
+{
+  "machine": "Apple Silicon GPU (MPS) · arm64 · Darwin",
+  "backend": "mps",
+  "torch_version": "2.13.0",
+  "tflops_fp16": 3.5700658817195197,
+  "tflops_fp32": 3.251264094496252,
+  "bw_dram": 89.44383504017446,
+  "bw_cache_peak": 175.80797670674872,
+  "cache_knee_mb": 6.0,
+  "t0_us": 4.754937486723065,
+  "t0_fit_us": 4.661659561637499,
+  "t_launch_us": 4.643999971449375,
+  "sync_cost_us": 225.1500030979514,
+  "bw_h2d": 24.212142830201763,
+  "bw_d2h": 23.432093374599223,
+  "mem_total_gb": 11.840011596679688,
+  "mem_usable_gb": 11.5
+}
