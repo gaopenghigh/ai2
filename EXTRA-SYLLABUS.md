@@ -108,7 +108,7 @@ flowchart LR
 |---|---|---|---|
 | X01 | [向量与点积](docs/extra/x01-vectors.md) | [notes](docs/extra/x01-notes.md) | `labs/extra/x01_vectors.py` |
 | X02 | [矩阵与形状](docs/extra/x02-matrices-shapes.md) | [notes](docs/extra/x02-notes.md) | `labs/extra/x02_shapes.py` |
-| X03 | Softmax 与概率 | | |
+| X03 | [Softmax 与概率](docs/extra/x03-softmax.md) | [notes](docs/extra/x03-notes.md) | [CPU 小演示](labs/extra/x03_softmax.py) |
 | X04 | 梯度与反向传播 | | |
 | X05 | 为什么需要注意力 | | |
 | X06 | 自注意力的完整推导 | | |
@@ -117,4 +117,4 @@ flowchart LR
 | X09 | FFN / 残差 / 归一化 | | |
 | X10 | 拼起来 + 参数量公式 | | |
 
-**怎么继续**：直接说「**生成 X03**」。
+**怎么继续**：直接说「**生成 X04**」。

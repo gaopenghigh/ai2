@@ -29,9 +29,14 @@ uv run python labs/day05/numerics.py          # Day 05 实验：把浮点数拆�
 uv run python labs/day06/stack_profile.py     # Day 06 实验：软件栈开销 / 异步 / profiler
 uv run python labs/day07/bench_hw.py          # Day 07 实验：一次量出机器的六个数（画像卡）
 uv run python labs/day07/bench_hw.py --predict   # 拿画像卡预测 TTFT / TPOT / 最大 batch
+uv run python labs/day08/param_count.py       # Day 08 可选验证：参数量逐项对账，不加载模型
+uv run python labs/day09/attention_cost.py    # Day 09 实验：Attention FLOPs 与内存账本
+uv run python labs/day09/attention_cost.py --demo  # CPU 小张量：形状 / 因果 mask / 缓存等价
+uv run python labs/day10/minigpt.py --check   # Day 10 实验：手写 Llama 前向，与 transformers 对账
 
 uv run python labs/extra/x01_vectors.py       # 附加 X01：向量 / 点积 / 从零训词向量
 uv run python labs/extra/x02_shapes.py        # 附加 X02：矩阵三种读法 / 形状追踪 / AI≈batch
+uv run python labs/extra/x03_softmax.py       # 附加 X03：稳定 softmax / 温度 / mask（CPU 小演示）
 ```
 
 ## 🎯 贯穿全课的主线问题
@@ -50,8 +55,8 @@ Day 01 提出，Day 84 你要能**不查资料、拿纸笔在 15 分钟内**完�
 | 周 | 主题 | 天 | 状态 |
 |---|---|---|---|
 | **W1** | 地基：体系结构视角 | [01](docs/week01/day01-ai-infra-overview.md) ⭐ [02](docs/week01/day02-roofline.md) ⭐ [03](docs/week01/day03-gpu-architecture.md) [04](docs/week01/day04-memory-hierarchy.md) [05](docs/week01/day05-numeric-formats.md) [06](docs/week01/day06-software-stack.md) [07](docs/week01/day07-week1-review.md) ⭐ | ✅ 7/7 |
-| **附加** | **[Transformer 与背后的数学](EXTRA-SYLLABUS.md)** | [X01](docs/extra/x01-vectors.md) [X02](docs/extra/x02-matrices-shapes.md) X03 X04 X05 X06 X07 X08 X09 X10 | 🟨 2/10 |
-| **W2** | Transformer 解剖 | 08 09 10 11 12 13 14 | ⬜ |
+| **附加** | **[Transformer 与背后的数学](EXTRA-SYLLABUS.md)** | [X01](docs/extra/x01-vectors.md) [X02](docs/extra/x02-matrices-shapes.md) [X03](docs/extra/x03-softmax.md) X04 X05 X06 X07 X08 X09 X10 | 🟨 3/10 |
+| **W2** | Transformer 解剖 | [08](docs/week02/day08-transformer-anatomy.md) ⭐ [09](docs/week02/day09-attention-complexity.md) [10](docs/week02/day10-minigpt.md) 11 12 13 14 | 🟨 3/7 |
 | **W3** | KV Cache 与注意力变体 | 15 ⭐ 16 ⭐ 17 18 19 20 21 | ⬜ |
 | **W4** | CUDA / Triton 算子 | 22 23 24 ⭐ 25 26 27 28 | ⬜ |
 | **W5** | FlashAttention / 量化 | 29 ⭐ 30 31 ⭐ 32 33 34 35 | ⬜ |
